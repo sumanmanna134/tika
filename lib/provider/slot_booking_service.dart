@@ -2,15 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tika/Model/booking_model.dart';
-
-final CollectionReference mainCollection = FirebaseFirestore.instance.collection('user');
 final FirebaseAuth auth = FirebaseAuth.instance;
-final documentId = auth.currentUser.uid.toString();
+final currentUserId = auth.currentUser.uid;
+final CollectionReference mainCollection = FirebaseFirestore.instance.collection(currentUserId);
+final documentId = "info";
 final DocumentReference documentReference = mainCollection.doc(documentId);
+final collectionAppointment = 'appointment';
 
 class Storage {
   Future<void> storeEventData(EventInfo eventInfo) async {
-    DocumentReference documentReferencer = documentReference.collection('events').doc(eventInfo.id);
+    DocumentReference documentReferencer = documentReference.collection(collectionAppointment).doc(eventInfo.id);
 
     Map<String, dynamic> data = eventInfo.toJson();
 
@@ -22,7 +23,7 @@ class Storage {
   }
 
   Future<void> updateEventData(EventInfo eventInfo) async {
-    DocumentReference documentReferencer = documentReference.collection('events').doc(eventInfo.id);
+    DocumentReference documentReferencer = documentReference.collection(collectionAppointment).doc(eventInfo.id);
 
     Map<String, dynamic> data = eventInfo.toJson();
 
@@ -34,7 +35,7 @@ class Storage {
   }
 
   Future<void> deleteEvent({@required String id}) async {
-    DocumentReference documentReferencer = documentReference.collection('events').doc(id);
+    DocumentReference documentReferencer = documentReference.collection(collectionAppointment).doc(id);
 
     await documentReferencer.delete().catchError((e) => print(e));
 
@@ -42,7 +43,7 @@ class Storage {
   }
 
   Stream<QuerySnapshot> retrieveEvents() {
-    Stream<QuerySnapshot> myClasses = documentReference.collection('events').orderBy('start').snapshots();
+    Stream<QuerySnapshot> myClasses = documentReference.collection(collectionAppointment).orderBy('start').snapshots();
 
     return myClasses;
   }

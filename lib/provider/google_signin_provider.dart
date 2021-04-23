@@ -6,6 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tika/services/firebase_service.dart';
 
 class GoogleSignInProvider extends ChangeNotifier{
+  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final googleSignIn = GoogleSignIn();
   bool _isSigningIn;
   GoogleSignInProvider(){
@@ -44,12 +45,8 @@ class GoogleSignInProvider extends ChangeNotifier{
   }
 
   Future<void> signOut() async {
-    DatabaseManager.removeFCM().whenComplete(()async {
-      await FirebaseAuth.instance.signOut().then((value){
-        googleSignIn.disconnect();
-      });
-    });
-
+    await firebaseAuth.signOut();
+    await googleSignIn.disconnect();
   }
 
 

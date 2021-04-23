@@ -6,6 +6,7 @@ import 'package:tika/Model/booking_model.dart';
 import 'package:tika/Utils/appconfig.dart';
 import 'package:tika/Utils/calendar_client.dart';
 import 'package:tika/provider/slot_booking_service.dart';
+import 'package:tika/services/background_messaging_handler.dart';
 
 class EditScreen extends StatefulWidget {
   final EventInfo event;
@@ -995,7 +996,10 @@ class _EditScreenState extends State<EditScreen> {
 
                                   await storage
                                       .updateEventData(eventInfo)
-                                      .whenComplete(() => Navigator.of(context).pop())
+                                      .whenComplete((){
+                                    showNotification(title: "Updated Status ${eventInfo.name}" , body: "Hey! Appointment has been changed at ${eventInfo.startTimeInEpoch}" );
+                                    Navigator.of(context).pop();
+                                  })
                                       .catchError(
                                         (e) => print(e),
                                   );

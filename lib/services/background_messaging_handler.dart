@@ -25,6 +25,8 @@ void notificationPermission() async{
     sound: true,
   );
 
+  await messaging.subscribeToTopic('newUpdate').whenComplete(() => print("newUpdate topic subscribe"));
+
   print('User granted permission: ${settings.authorizationStatus}');
 }
 
@@ -34,28 +36,30 @@ void initMessaging(){
   var iosInit = IOSInitializationSettings();
   var initSettings = InitializationSettings(android: androidInit, iOS: iosInit);
   notificationsPlugin = FlutterLocalNotificationsPlugin();
-  notificationsPlugin.initialize(initSettings);
+  notificationsPlugin.initialize(initSettings );
 
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print('Got a message whilst in the foreground!');
     print('Message data: ${message.data}');
-    showNotification();
-
     if (message.notification != null) {
+      showNotification(title: message.notification.title , body:message.notification.body);
 
       print('Message also contained a notification: ${message.notification}');
     }
   });
 }
 
-void showNotification()async{
-  var androidDetails = AndroidNotificationDetails("channelId", "channelName", "channelDescription");
+void showNotification({String title, String body})async{
+  var androidDetails = AndroidNotificationDetails("channelId", "channelName", "channelDescription" , priority: Priority.high, importance: Importance.max);
+
   var iosDetails = IOSNotificationDetails();
   var generalNotificationDetails = NotificationDetails(android: androidDetails, iOS: iosDetails);
-  await notificationsPlugin.show(0, "title"," body", generalNotificationDetails, payload: "payload");
+  await notificationsPlugin.show(0, title,body, generalNotificationDetails, payload: "payload");
 
 }
+
+
 
  getToken() async{
   await messaging.getToken().then((token) => StorageUtil.putString("fcm_token",token));

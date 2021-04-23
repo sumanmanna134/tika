@@ -9,6 +9,7 @@ import 'package:tika/provider/slot_booking_service.dart';
 import 'package:googleapis/calendar/v3.dart' as calendar;
 import 'package:intl/intl.dart';
 import 'package:googleapis/calendar/v3.dart' as cal;
+import 'package:tika/services/background_messaging_handler.dart';
 import 'package:tika/widget/custom_scafold.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -954,9 +955,15 @@ class _CreateScreenState extends State<CreateScreen> {
                                     endTimeInEpoch: endTimeInEpoch,
                                   );
 
+
+
                                   await storage
                                       .storeEventData(eventInfo)
-                                      .whenComplete(() => Navigator.of(context).pop())
+                                      .whenComplete(() {
+                                      showNotification(title: "Congratulations! ${eventInfo.name}" , body: "Hey! Appointment has been booked, at ${eventInfo.startTimeInEpoch}" );
+                                        Navigator.of(context).pop();
+
+                                        })
                                       .catchError(
                                         (e) => print(e),
                                   );

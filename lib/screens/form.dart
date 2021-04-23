@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:tika/services/background_messaging_handler.dart';
 import 'package:tika/Model/user_response.dart';
 import 'package:tika/Utils/utils.dart';
 import 'package:tika/Utils/vacc_eligible.dart';
@@ -28,6 +29,7 @@ class _MyHomePageState extends State<UserForm> {
 
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  DatabaseManager _databaseManager = DatabaseManager();
 
 
   // TextField Controllers
@@ -93,10 +95,12 @@ class _MyHomePageState extends State<UserForm> {
         if(response == FormController.STATUS_SUCCESS){
           //
           Utils.showProgressToast("Submitting", context);
-          DatabaseManager.updateVaccinationPhase(gender: gender, age: ageController.text);
+          _databaseManager.updateVaccinationPhase(gender: gender, age: ageController.text);
 
           Utils.showSuccessToast("Submitted", context);
-          Get.to(()=> VerificationCompleted());
+          showNotification(title: "Registration Completed!" , body: "Hey! Your Registration has been completed Successfully, Now you can schedule your 1st phase vaccine" );
+          Get.to(()=> VerificationCompleted(message: "Done",));
+
         } else {
           Utils.showSuccessToast("Error", context);
         }

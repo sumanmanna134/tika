@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:tika/Utils/utils.dart';
 import 'package:tika/provider/phone_provider.dart';
 import 'package:tika/screens/form.dart';
+import 'package:tika/services/background_messaging_handler.dart';
 import 'package:tika/widget/verification_complete.dart';
 
 import 'numericpads.dart';
@@ -248,7 +249,8 @@ class _VerifyPhoneState extends State<VerifyPhone> {
           .verifyOTP(code)
           .then((_) {
 
-        Get.to(()=> VerificationCompleted());
+        Get.to(()=> VerificationCompleted(message: "Verified",));
+        showNotification(title: "Congratulations!" , body: "Hey! Your Phone successfully linked with your email" );
       }).catchError((e) {
         String errorMsg =
             'Cant authentiate you Right now, Try again later!';

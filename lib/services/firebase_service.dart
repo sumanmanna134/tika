@@ -14,22 +14,21 @@ class DatabaseManager extends ChangeNotifier{
 
   static FirebaseAuth auth = FirebaseAuth.instance;
 
+
   static Future<void> createUser()async{
 
     String name = auth.currentUser.displayName;
-
-
-    final documentId = auth.currentUser.uid.toString();
-    final collection = "user";
+    final documentId = "info";
+    final collection = auth.currentUser.uid.toString();
     final FirebaseFirestore _db = FirebaseFirestore.instance;
-    final snapshot = await _db.collection('user').doc(documentId).get();
+    final snapshot = await _db.collection(collection).doc(documentId).get();
     String email = auth.currentUser.email;
     UserModel userModel = UserModel(name:name, email: email, age: null, phone: null , vaccinePhase: null , hasVerified: false ,gender: null );
 
     if(snapshot.exists){
      print("Exist");
     }else {
-      _db.collection(collection).doc(auth.currentUser.uid).set(userModel.toJson());
+      _db.collection(collection).doc(documentId).set(userModel.toJson());
 
 
     }
@@ -41,40 +40,55 @@ class DatabaseManager extends ChangeNotifier{
 
   getData()async{
 
-    final documentId = auth.currentUser.uid.toString();
-    final collection = "user";
+    final collection = auth.currentUser.uid.toString();
+    final documentId  = "info";
     final FirebaseFirestore _db = FirebaseFirestore.instance;
-    final snapshot = await _db.collection('user').doc(documentId).get();
-    vaccinaionPhase = snapshot.get('vaccinePhase');
-    hasVerified = snapshot.get('hasVerified')==null? false: true;
-    gender = snapshot.get('gender');
-    age = snapshot.get("age");
-    notifyListeners();
+    final snapshot = await _db.collection(collection).doc(documentId).get();
+
+    if(snapshot.data().containsKey('vaccinePhase')){
+      vaccinaionPhase = snapshot.get('vaccinePhase');
+      hasVerified = snapshot.get('hasVerified')==null? false: true;
+      gender = snapshot.get('gender');
+      age = snapshot.get("age");
+      notifyListeners();
+    }else {
+
+      print("vaccinePhase not exist ");
+    }
+
+
 
   }
 
-  static updateVaccinationPhase({String age, String gender}) async{
-    final documentId = auth.currentUser.uid.toString();
-    final collection = "user";
+  updateVaccinationPhase({String age, String gender}) async{
+    final collection = auth.currentUser.uid.toString();
+    final documentId  = "info";
     final FirebaseFirestore _db = FirebaseFirestore.instance;
-    final snapshot = await _db.collection('user').doc(documentId).get();
+    final snapshot = await _db.collection(collection).doc(documentId).get();
     if(snapshot.get('vaccinePhase')==null){
-      _db.collection(collection).doc(auth.currentUser.uid).update({
+      _db.collection(collection).doc(documentId).update({
         "vaccinePhase": "0",
         "age":age,
         "gender":gender,
       });
+      notifyListeners();
     }else if(snapshot.get('vaccinePhase')=="0"){
-      _db.collection(collection).doc(auth.currentUser.uid).update({
+      _db.collection(collection).doc(documentId).update({
         "vaccinePhase": "1",
 
       });
+
+      notifyListeners();
     }else if(snapshot.get('vaccinePhase')=='1'){
-      _db.collection(collection).doc(auth.currentUser.uid).update({
+      _db.collection(collection).doc(documentId).update({
         "vaccinePhase": "2",
 
       });
+
+      notifyListeners();
     }
+
+
 
 
 
@@ -84,14 +98,16 @@ class DatabaseManager extends ChangeNotifier{
 
   static Future<void> setFcmToken(String token)async{
     FirebaseAuth auth = FirebaseAuth.instance;
-    final documentId = auth.currentUser.uid.toString();
+    final collection = auth.currentUser.uid.toString();
+    final documentId  = "info";
+
     final field= 'fcm_token';
-    final collection = "user";
+
     final FirebaseFirestore _db = FirebaseFirestore.instance;
-    final snapshot = await _db.collection('user').doc(documentId).get();
+    final snapshot = await _db.collection(collection).doc(documentId).get();
 
 
-    _db.collection(collection).doc(auth.currentUser.uid).update({
+    _db.collection(collection).doc(documentId).update({
       field: token,
       'createdAt': FieldValue.serverTimestamp(), // optional
 
@@ -103,24 +119,25 @@ class DatabaseManager extends ChangeNotifier{
 
 
 
-  static Future<void> removeFCM()async{
-    FirebaseAuth auth = FirebaseAuth.instance;
-    final documentId = auth.currentUser.uid.toString();
-    final field= 'fcm_token';
-    final collection = "user";
-    final FirebaseFirestore _db = FirebaseFirestore.instance;
-    final snapshot = await _db.collection('user').doc(documentId).get();
-
-    if(snapshot.data().containsKey(field)){
-      _db.collection(collection).doc(auth.currentUser.uid).update({'fcm_token': null});
-    }else {
-      print("not exist");
-    }
-
-
-
-
-  }
+  // static Future<void> removeFCM()async{
+  //   FirebaseAuth auth = FirebaseAuth.instance;
+  //   final collection = auth.currentUser.uid.toString();
+  //   final documentId  = "info";
+  //   final field= 'fcm_token';
+  //
+  //   final FirebaseFirestore _db = FirebaseFirestore.instance;
+  //   final snapshot = await _db.collection(collection).doc(documentId).get();
+  //
+  //   if(snapshot.data().containsKey(field)){
+  //     _db.collection(collection).doc(documentId).update({'fcm_token': null});
+  //   }else {
+  //     print("not exist");
+  //   }
+  //
+  //
+  //
+  //
+  // }
 
 
 

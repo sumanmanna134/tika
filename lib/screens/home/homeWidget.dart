@@ -32,6 +32,8 @@ class _HomeWidgetState extends State<HomeWidget> {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+    final vaccine = Provider.of<DatabaseManager>(context, listen: false);
+    vaccine.getData();
     getToken();
     return SafeArea(
       child: MyScaffold(
@@ -120,7 +122,37 @@ class _HomeWidgetState extends State<HomeWidget> {
                             ),
                           ),
 
-                          VaccinationDashboard()
+                          Consumer<DatabaseManager>(
+                            builder: (context, state , child){
+                              if(state.vaccinaionPhase!=null){
+                                return Container(
+                                  height: 45,
+                                  child: FlatButton(
+                                    onPressed: (){
+
+                                      Get.to(()=> DashboardScreen());
+
+                                    },
+
+                                    color: Colors.blue,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                    child: Container(
+                                      padding: EdgeInsets.only(left: 20,right: 20),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Icon(Icons.calendar_today,color: Colors.white,),
+                                          SizedBox(width: 10,),
+                                          Text("Vaccination",style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white,fontSize: 16),),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                              return SizedBox.shrink();
+
+                            },
+                          )
 
 
 
@@ -187,7 +219,42 @@ class _HomeWidgetState extends State<HomeWidget> {
               ),
               SizedBox(height: 10,),
 
-              VaccinationBanner(),
+
+              Consumer<DatabaseManager>(
+                builder: (context, state, child){
+                  return state.vaccinaionPhase==null?GestureDetector(
+                    onTap: (){
+                      user.phoneNumber!=null?
+                      Get.to(()=> UserForm()) : Get.to(()=> ContinueWithPhone());
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(left: 20,right: 20),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.blueGrey.withOpacity(0.7),
+                      ),
+                      padding: EdgeInsets.all(16),
+                      child: Row(
+                        children: <Widget>[
+                          Image.asset(Images.vaccine,height: 80,width: 80,),
+                          SizedBox(width: 24,),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text("Vaccine Registration"
+                                  ,style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Colors.white),),
+                                SizedBox(height: 10,),
+                                Text("COVID-19 Vaccination For Everyone Above 45",style: TextStyle(fontSize: 16,height: 1.5,color: Colors.white),),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ): SizedBox.shrink();
+                },
+              ),
 
               SizedBox(height: 30,)
             ],
@@ -199,77 +266,6 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 }
 
-class VaccinationBanner extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-    final vaccine = Provider.of<DatabaseManager>(context);
-    print(vaccine.vaccinaionPhase);
 
-    return vaccine.vaccinaionPhase==null?GestureDetector(
-      onTap: (){
-        user.phoneNumber!=null?
-        Get.to(()=> UserForm()) : Get.to(()=> ContinueWithPhone());
-      },
-      child: Container(
-        margin: EdgeInsets.only(left: 20,right: 20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: Colors.blueGrey.withOpacity(0.7),
-        ),
-        padding: EdgeInsets.all(16),
-        child: Row(
-          children: <Widget>[
-            Image.asset(Images.vaccine,height: 80,width: 80,),
-            SizedBox(width: 24,),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text("Vaccine Registration"
-                    ,style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Colors.white),),
-                  SizedBox(height: 10,),
-                  Text("COVID-19 Vaccination For Everyone Above 45",style: TextStyle(fontSize: 16,height: 1.5,color: Colors.white),),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    ): SizedBox.shrink();
-  }
-}
 
-class VaccinationDashboard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-    final vaccine = Provider.of<DatabaseManager>(context);
-    vaccine.getData();
-
-    return vaccine.vaccinaionPhase=="0"?Container(
-      height: 45,
-      child: FlatButton(
-        onPressed: (){
-
-          Get.to(()=> DashboardScreen());
-
-        },
-
-        color: Colors.blue,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-        child: Container(
-          padding: EdgeInsets.only(left: 20,right: 20),
-          child: Row(
-            children: <Widget>[
-              Icon(Icons.calendar_today,color: Colors.white,),
-              SizedBox(width: 10,),
-              Text("Vaccination",style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white,fontSize: 16),),
-            ],
-          ),
-        ),
-      ),
-    ): SizedBox.shrink();
-  }
-}
 

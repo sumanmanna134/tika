@@ -9,7 +9,7 @@ import 'package:tika/widget/default_button.dart';
 class VerificationCompleted extends StatelessWidget {
   final String message;
 
-  const VerificationCompleted({Key key, this.message}) : super(key: key);
+  const VerificationCompleted({Key key, @required this.message}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MyScaffold(

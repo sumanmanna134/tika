@@ -11,6 +11,7 @@ class DatabaseManager extends ChangeNotifier{
   bool hasVerified = false;
   String gender;
   String age;
+  int notificationCount=0;
 
   static FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -27,6 +28,9 @@ class DatabaseManager extends ChangeNotifier{
 
     if(snapshot.exists){
      print("Exist");
+     if(!snapshot.data().containsKey('notification')){
+       _db.collection(collection).doc(documentId).update({"notification":0});
+     }
     }else {
       _db.collection(collection).doc(documentId).set(userModel.toJson());
 
@@ -45,11 +49,23 @@ class DatabaseManager extends ChangeNotifier{
     final FirebaseFirestore _db = FirebaseFirestore.instance;
     final snapshot = await _db.collection(collection).doc(documentId).get();
 
-    if(snapshot.data().containsKey('vaccinePhase')){
-      vaccinaionPhase = snapshot.get('vaccinePhase');
-      hasVerified = snapshot.get('hasVerified')==null? false: true;
-      gender = snapshot.get('gender');
-      age = snapshot.get("age");
+    if(snapshot.exists){
+      vaccinaionPhase = snapshot.data().containsKey('vaccinePhase')?
+      snapshot.get('vaccinePhase')==null?null:snapshot.get('vaccinePhase'): null;
+      hasVerified = snapshot.data().containsKey('hasVerified')?snapshot.get('hasVerified')==null? false: true:false;
+      gender = snapshot.data().containsKey('gender')?snapshot.get('gender'):null;
+      age = snapshot.data().containsKey('age') ? snapshot.get("age"):null;
+
+      // print(snapshot.get('notification'));
+      if(!snapshot.data().containsKey('notification')){
+        _db.collection(collection).doc(documentId).update({"notification":0});
+        notificationCount = snapshot.data().containsKey('notification')?snapshot.get('notification')==0?0:snapshot.get('notification'):0;
+
+      }else{
+        notificationCount = snapshot.data().containsKey('notification')?snapshot.get('notification')==0?0:snapshot.get('notification'):0;
+
+
+      }
       notifyListeners();
     }else {
 
@@ -112,6 +128,39 @@ class DatabaseManager extends ChangeNotifier{
       'createdAt': FieldValue.serverTimestamp(), // optional
 
     });
+
+  }
+
+  setNotifier({bool seen=false})async{
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final collection = auth.currentUser.uid.toString();
+    final documentId  = "info";
+
+    final field= 'notification';
+
+    final FirebaseFirestore _db = FirebaseFirestore.instance;
+    final snapshot = await _db.collection(collection).doc(documentId).get();
+
+
+    if(snapshot.data().containsKey(field)){
+      if(seen==true){
+        _db.collection(collection).doc(documentId).update({
+          field: 0
+        }).whenComplete(() {
+          notificationCount = 0;
+          notifyListeners();
+        }).catchError((e) => print(e));
+      }else{
+        _db.collection(collection).doc(documentId).update({
+          field: snapshot.get(field) + 1
+        }).then((value) {
+          notificationCount = snapshot.get(field);
+          notifyListeners();
+        }).catchError((e) => print(e));
+      }
+    }else{
+      _db.collection(collection).doc(documentId).update({"notification":0});
+    }
 
   }
 

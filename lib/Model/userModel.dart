@@ -16,7 +16,8 @@ class UserModel {
     this.age,
     this.vaccinePhase,
     this.gender,
-    this.hasVerified
+    this.hasVerified,
+    this.notification
 
   });
 
@@ -27,6 +28,7 @@ class UserModel {
   String gender;
   String vaccinePhase;
   bool hasVerified;
+  int notification;
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
     name: json["name"] == null ? null : json["name"],
@@ -35,6 +37,7 @@ class UserModel {
     age: json["age"] == null ? null : json["age"],
     vaccinePhase: json["vaccinePhase"] == null ? null : json["vaccinePhase"],
     gender: json["gender"] == null ? null : json["gender"],
+    notification: json['notification']==null?0:json['notification']
 
 
   );
@@ -47,6 +50,7 @@ class UserModel {
     "vaccinePhase": vaccinePhase == null? null : vaccinePhase,
     "hasVerified" : hasVerified == null ? false : hasVerified,
     "gender" : gender == null ? null : gender,
+    "notification":notification==null?0:notification,
 
 
   };

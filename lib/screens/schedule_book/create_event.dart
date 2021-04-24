@@ -960,7 +960,7 @@ class _CreateScreenState extends State<CreateScreen> {
                                   await storage
                                       .storeEventData(eventInfo)
                                       .whenComplete(() {
-                                      showNotification(title: "Congratulations! ${eventInfo.name}" , body: "Hey! Appointment has been booked, at ${eventInfo.startTimeInEpoch}" );
+                                      showNotification(title: "Congratulations! ${eventInfo.name}" , body: "Hey! Appointment has been booked, at ${DateTime.fromMillisecondsSinceEpoch(eventInfo.startTimeInEpoch)}" );
                                         Navigator.of(context).pop();
 
                                         })

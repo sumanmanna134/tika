@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:tika/Model/prevention.dart';
 import 'package:tika/Utils/appconfig.dart';
 import 'package:tika/screens/form.dart';
+import 'package:tika/screens/notification/notification_screen.dart';
 import 'package:tika/screens/phoneAuth/continue_with_phone.dart';
 import 'package:tika/screens/profile/profile.dart';
 import 'package:tika/screens/schedule_book/dash_board.dart';
@@ -12,6 +14,7 @@ import 'package:tika/screens/schedule_book/schedule_widget.dart';
 import 'package:tika/services/background_messaging_handler.dart';
 import 'package:tika/services/firebase_service.dart';
 import 'package:tika/widget/custom_scafold.dart';
+import 'package:tika/widget/notification_icon_widget.dart';
 import 'package:tika/widget/pre_bording_questions.dart';
 import 'package:tika/widget/prevention_list.dart';
 class HomeWidget extends StatefulWidget {
@@ -60,7 +63,18 @@ class _HomeWidgetState extends State<HomeWidget> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Icon(Icons.menu, color: Colors.white, size: 35,),
-                          Icon(Icons.notifications,color: Colors.white,size: 30,),
+
+                          Consumer<DatabaseManager>(
+                            builder: (context, notification, child){
+                              return NamedIcon(iconData:Icons.notifications , onTap: (){
+                                notification.setNotifier(seen: true);
+                                Get.to(()=> NotificationScreen());
+
+                              }, notificationCount: notification.notificationCount,) ;
+                            },
+
+                          )
+
 
                         ],
 
@@ -265,6 +279,8 @@ class _HomeWidgetState extends State<HomeWidget> {
     );
   }
 }
+
+
 
 
 
